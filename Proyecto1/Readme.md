@@ -543,6 +543,36 @@ exit
 
 ---
 
+Configurar contraseña en switches:
+
+```sh
+enable
+configure terminal
+
+hostname SW-CORE
+enable secret 201504070
+enable password 201504070
+service password-encryption
+
+line console 0
+password 201504070
+login
+exit
+
+line vty 0 4
+password 201504070
+login
+exit
+
+line vty 5 15
+password 201504070
+login
+exit
+
+end
+write memory
+exit
+```
 
 ### 2.1. Verificar que todo funciona
 
