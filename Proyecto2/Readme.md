@@ -96,7 +96,7 @@ Se usa FLSM con prefijo **/30** (2 hosts útiles por enlace).
 
 | VLAN | Nombre   | ID VLAN | Hosts Req. | Hosts Útiles | Red              | Máscara         | Gateway        | Rango Usable                    | Broadcast      |
 |------|----------|---------|------------|--------------|------------------|-----------------|----------------|---------------------------------|----------------|
-| 2Y   | Web_Apps | 20      | 28         | 30           | 172.16.73.0/27   | 255.255.255.224 | 172.16.73.1    | 172.16.73.2 – 172.16.73.30      | 172.16.73.31   |
+| 2Y   | Web_Apps | 20      | 28         | 30           | 172.16.73.0/27   | 255.255.255.224 | 10.70.0.58     | 172.16.73.2 – 172.16.73.30      | 172.16.73.31   |
 | 1Y   | Core_BD  | 10      | 14         | 14           | 172.16.73.32/28  | 255.255.255.240 | 172.16.73.33   | 172.16.73.34 – 172.16.73.46     | 172.16.73.47   |
 | 3Y   | NOC      | 30      | 10         | 14           | 172.16.73.48/28  | 255.255.255.240 | 172.16.73.49   | 172.16.73.50 – 172.16.73.62     | 172.16.73.63   |
 
@@ -330,34 +330,28 @@ El aislamiento en el **segmento de rutas estáticas** responde a las políticas 
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname R-Core1
 
-! ── Interfaz Fibra hacia R-Core3 ──────────────────────
 interface FastEthernet4/0
 description FIBRA-hacia-R-Core3
 ip address 10.70.0.5 255.255.255.252
 no shutdown
 
-! ── Interfaz Ethernet hacia R-Core2 ───────────────────
 interface GigabitEthernet6/0
 description ENLACE-hacia-R-Core2
 ip address 10.70.0.1 255.255.255.252
 no shutdown
 
-! ── Interfaz hacia R-Central1 ─────────────────────────
 interface GigabitEthernet8/0
 description ENLACE-hacia-R-Central1
 ip address 10.70.0.13 255.255.255.252
 no shutdown
 
-! ── Interfaz hacia MS1 (Sede Oriente) ─────────────────
 interface GigabitEthernet9/0
 description ENLACE-hacia-MS1-SedeOriente
 ip address 10.70.0.29 255.255.255.252
 no shutdown
 
-! ── OSPF ───────────────────────────────────────────────
 router ospf 1
 router-id 1.1.1.1
 network 10.70.0.4 0.0.0.3 area 0
@@ -377,38 +371,31 @@ write memory
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname R-Core2
 
-! ── Interfaz Ethernet hacia R-Core1 ───────────────────
 interface GigabitEthernet6/0
 description ENLACE-hacia-R-Core1
 ip address 10.70.0.2 255.255.255.252
 no shutdown
 
-! ── Interfaz Serial hacia R-Core3 (DCE) ───────────────
 interface Serial2/0
 description SERIAL-WAN-hacia-R-Core3-DCE
 ip address 10.70.0.9 255.255.255.252
 clock rate 64000
 no shutdown
 
-! ── Interfaz hacia R-Norte ────────────────────────────
 interface GigabitEthernet8/0
 description ENLACE-hacia-R-Norte
 ip address 10.70.0.17 255.255.255.252
 no shutdown
 
-! ── OSPF ───────────────────────────────────────────────
 router ospf 1
 router-id 2.2.2.2
 network 10.70.0.0 0.0.0.3 area 0
 network 10.70.0.8 0.0.0.3 area 0
 network 10.70.0.16 0.0.0.3 area 0
-redistribute eigrp 1 subnets metric-type 2
-#default-metric 20
+redistribute eigrp 1 subnets
 
-! ── EIGRP ──────────────────────────────────────────────
 router eigrp 1
 network 10.70.0.16 0.0.0.3
 redistribute ospf 1 metric 10000 100 255 1 1500
@@ -426,38 +413,30 @@ write memory
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname R-Core3
 
-! ── Interfaz Fibra hacia R-Core1 ──────────────────────
 interface FastEthernet4/0
 description FIBRA-hacia-R-Core1
 ip address 10.70.0.6 255.255.255.252
 no shutdown
 
-! ── Interfaz Serial hacia R-Core2 (DTE) ───────────────
 interface Serial2/0
 description SERIAL-WAN-hacia-R-Core2-DTE
 ip address 10.70.0.10 255.255.255.252
 no shutdown
 
-! ── Interfaz hacia R-Occidente ────────────────────────
 interface GigabitEthernet6/0
 description ENLACE-hacia-R-Occidente
 ip address 10.70.0.21 255.255.255.252
 no shutdown
 
-! ── OSPF ───────────────────────────────────────────────
 router ospf 1
 router-id 3.3.3.3
 network 10.70.0.4 0.0.0.3 area 0
 network 10.70.0.8 0.0.0.3 area 0
 network 10.70.0.20 0.0.0.3 area 0
 redistribute rip subnets
-#redistribute rip subnets metric-type 2
-#default-metric 20
 
-! ── RIPv2 ──────────────────────────────────────────────
 router rip
 version 2
 network 10.70.0.20
@@ -476,64 +455,27 @@ write memory
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname R-Central1
 
-! ── Interfaz hacia R-Core1 ────────────────────────────
 interface GigabitEthernet0/0
 description ENLACE-hacia-R-Core1
 ip address 10.70.0.14 255.255.255.252
 no shutdown
 
-! ── Interfaz hacia R-Central2 ─────────────────────────
 interface GigabitEthernet0/1
 description ENLACE-hacia-R-Central2
 ip address 10.70.0.25 255.255.255.252
 no shutdown
 
-! ── Rutas estáticas hacia el Data Center ──────────────
-ip route 172.16.73.0 255.255.255.224 10.70.0.26
+ip route 172.16.73.0  255.255.255.224 10.70.0.26
 ip route 172.16.73.32 255.255.255.240 10.70.0.26
 ip route 172.16.73.48 255.255.255.240 10.70.0.26
 
-! ── OSPF + redistribución de rutas estáticas ──────────
 router ospf 1
 router-id 4.4.4.4
 network 10.70.0.12 0.0.0.3 area 0
 network 10.70.0.24 0.0.0.3 area 0
 redistribute static subnets
-#redistribute static subnets metric-type 2
-#default-metric 20
-
-end
-write memory
-```
-
----
-
-### R-Central2 (Router 2911)
-
-```sh
-enable
-configure terminal
-
-! ── Hostname ──────────────────────────────────────────
-hostname R-Central2
-
-! ── Interfaz hacia R-Central1 ─────────────────────────
-interface GigabitEthernet0/0
-description ENLACE-hacia-R-Central1
-ip address 10.70.0.26 255.255.255.252
-no shutdown
-
-! ── Interfaz hacia SW-Dist-DC ─────────────────────────
-interface GigabitEthernet0/1
-description ENLACE-hacia-SW-Dist-DC
-ip address 172.16.73.1 255.255.255.224
-no shutdown
-
-! ── Rutas estáticas de retorno ────────────────────────
-ip route 0.0.0.0 0.0.0.0 10.70.0.25
 
 end
 write memory
@@ -547,16 +489,13 @@ write memory
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname R-Norte
 
-! ── Interfaz hacia R-Core2 ────────────────────────────
 interface GigabitEthernet0/0
 description ENLACE-hacia-R-Core2
 ip address 10.70.0.18 255.255.255.252
 no shutdown
 
-! ── Interfaz hacia SW-Core-N (subinterfaces inter-VLAN) 
 interface GigabitEthernet0/1
 description TRUNK-hacia-SW-Core-N
 no shutdown
@@ -579,10 +518,9 @@ encapsulation dot1Q 70
 ip address 172.16.71.97 255.255.255.240
 no shutdown
 
-! ── EIGRP ──────────────────────────────────────────────
 router eigrp 1
 network 10.70.0.16 0.0.0.3
-network 172.16.71.0 0.0.0.63
+network 172.16.71.0  0.0.0.63
 network 172.16.71.64 0.0.0.31
 network 172.16.71.96 0.0.0.15
 no auto-summary
@@ -599,16 +537,13 @@ write memory
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname R-Occidente
 
-! ── Interfaz hacia R-Core3 ────────────────────────────
 interface GigabitEthernet0/0
 description ENLACE-hacia-R-Core3
 ip address 10.70.0.22 255.255.255.252
 no shutdown
 
-! ── Router-on-a-Stick hacia SW-Dist-OCC ───────────────
 interface GigabitEthernet0/1
 description TRUNK-RoaS-hacia-SW-Dist-OCC
 no shutdown
@@ -637,7 +572,6 @@ encapsulation dot1Q 40
 ip address 172.16.70.97 255.255.255.240
 no shutdown
 
-! ── RIPv2 ──────────────────────────────────────────────
 router rip
 version 2
 network 10.70.0.20
@@ -660,15 +594,12 @@ write memory
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname SW-Dist-OCC
 
-! ── VTP Server ────────────────────────────────────────
 vtp mode server
 vtp domain bantech70
-vtp password 201504070
+vtp password cisco
 
-! ── Crear VLANs (solo en el VTP Server) ───────────────
 vlan 10
 name Cajas
 vlan 20
@@ -678,14 +609,12 @@ name Gerencia
 vlan 40
 name Seguridad
 
-! ── Puerto Trunk hacia R-Occidente (RoaS) ─────────────
 interface GigabitEthernet0/1
 description TRUNK-hacia-R-Occidente
 switchport mode trunk
 switchport trunk allowed vlan 10,20,30,40
 no shutdown
 
-! ── Puertos Trunk hacia switches de acceso ────────────
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Cajas
 switchport mode trunk
@@ -724,19 +653,16 @@ configure terminal
 
 hostname SW-Cajas
 
-! ── VTP Client ────────────────────────────────────────
 vtp mode client
 vtp domain bantech70
-vtp password 201504070
+vtp password cisco
 
-! ── Puerto Trunk hacia SW-Dist-OCC ────────────────────
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Dist-OCC
 switchport mode trunk
 switchport trunk allowed vlan 10
 no shutdown
 
-! ── Puerto de Acceso hacia PC-Caja1 ───────────────────
 interface FastEthernet0/2
 description ACCESO-PC-Caja1-VLAN10
 switchport mode access
@@ -759,7 +685,7 @@ hostname SW-Asesores
 
 vtp mode client
 vtp domain bantech70
-vtp password 201504070
+vtp password cisco
 
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Dist-OCC
@@ -789,7 +715,7 @@ hostname SW-Gerencia
 
 vtp mode client
 vtp domain bantech70
-vtp password 201504070
+vtp password cisco
 
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Dist-OCC
@@ -819,7 +745,7 @@ hostname SW-Seguridad
 
 vtp mode client
 vtp domain bantech70
-vtp password 201504070
+vtp password cisco
 
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Dist-OCC
@@ -841,8 +767,6 @@ write memory
 
 ### PCs — Sede Occidente
 
-Cada PC se configura desde su pestaña **Desktop → IP Configuration**:
-
 | PC | IP Address | Subnet Mask | Default Gateway |
 |----|-----------|-------------|-----------------|
 | PC-Caja1 | 172.16.70.2 | 255.255.255.192 | 172.16.70.1 |
@@ -862,10 +786,8 @@ Cada PC se configura desde su pestaña **Desktop → IP Configuration**:
 enable
 configure terminal
 
-! ── Hostname ──────────────────────────────────────────
 hostname SW-Core-N
 
-! ── VLANs ─────────────────────────────────────────────
 vlan 50
 name Analisis
 vlan 60
@@ -873,20 +795,17 @@ name Auditoria
 vlan 70
 name Legal
 
-! ── Rapid PVST+ y Root Bridge forzado ─────────────────
 spanning-tree mode rapid-pvst
 spanning-tree vlan 50 priority 4096
 spanning-tree vlan 60 priority 4096
 spanning-tree vlan 70 priority 4096
 
-! ── Puerto Trunk hacia R-Norte ────────────────────────
 interface GigabitEthernet0/1
 description TRUNK-hacia-R-Norte
 switchport mode trunk
 switchport trunk allowed vlan 50,60,70
 no shutdown
 
-! ── Puertos Trunk hacia switches de acceso ────────────
 interface FastEthernet0/1
 description TRUNK-hacia-SW-A-N1
 switchport mode trunk
@@ -913,30 +832,25 @@ configure terminal
 
 hostname SW-A-N1
 
-! ── Rapid PVST+ ───────────────────────────────────────
 spanning-tree mode rapid-pvst
 
-! ── VLANs locales ─────────────────────────────────────
 vlan 50
 name Analisis
 vlan 70
 name Legal
 
-! ── Puerto Trunk hacia SW-Core-N ──────────────────────
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Core-N
 switchport mode trunk
 switchport trunk allowed vlan 50,60,70
 no shutdown
 
-! ── Puerto Trunk hacia SW-A-N2 (bucle STP) ────────────
 interface FastEthernet0/2
 description TRUNK-BUCLE-hacia-SW-A-N2
 switchport mode trunk
 switchport trunk allowed vlan 50,60,70
 no shutdown
 
-! ── Puertos de Acceso ─────────────────────────────────
 interface FastEthernet0/3
 description ACCESO-PC-Analista1-VLAN50
 switchport mode access
@@ -968,21 +882,18 @@ spanning-tree mode rapid-pvst
 vlan 60
 name Auditoria
 
-! ── Puerto Trunk hacia SW-Core-N ──────────────────────
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Core-N
 switchport mode trunk
 switchport trunk allowed vlan 50,60,70
 no shutdown
 
-! ── Puerto Trunk hacia SW-A-N1 (bucle STP) ────────────
 interface FastEthernet0/2
 description TRUNK-BUCLE-hacia-SW-A-N1
 switchport mode trunk
 switchport trunk allowed vlan 50,60,70
 no shutdown
 
-! ── Puerto de Acceso ──────────────────────────────────
 interface FastEthernet0/3
 description ACCESO-PC-Auditor1-VLAN60
 switchport mode access
@@ -1005,27 +916,25 @@ write memory
 
 ---
 
-### 🏛️ SEDE ORIENTE
+## 🏛️ SEDE ORIENTE
 
-## MS1 (Switch 3560-24PS) — HSRP Active
- 
+---
+
+### MS1 (Switch 3560-24PS) — HSRP Active
+
 ```sh
 enable
 configure terminal
- 
-! ── Hostname ──────────────────────────────────────────
+
 hostname MS1
- 
-! ── Habilitar enrutamiento IP (Layer 3) ───────────────
+
 ip routing
- 
-! ── VLANs ─────────────────────────────────────────────
+
 vlan 80
 name Boveda
 vlan 90
 name Plataforma
- 
-! ── Interfaces VLAN con HSRP ──────────────────────────
+
 interface Vlan80
 description GATEWAY-VLAN80-Boveda
 ip address 172.16.72.2 255.255.255.192
@@ -1033,7 +942,7 @@ standby 1 ip 172.16.72.1
 standby 1 priority 110
 standby 1 preempt
 no shutdown
- 
+
 interface Vlan90
 description GATEWAY-VLAN90-Plataforma
 ip address 172.16.72.66 255.255.255.192
@@ -1041,37 +950,33 @@ standby 1 ip 172.16.72.65
 standby 1 priority 110
 standby 1 preempt
 no shutdown
- 
-! ── Puerto Trunk hacia SW-ACC-OR ──────────────────────
+
 interface FastEthernet0/1
 description TRUNK-hacia-SW-ACC-OR
 switchport trunk encapsulation dot1q
 switchport mode trunk
 switchport trunk allowed vlan 80,90
 no shutdown
- 
-! ── Puerto Trunk hacia MS2 (sincronización) ───────────
+
 interface FastEthernet0/2
 description TRUNK-hacia-MS2
 switchport trunk encapsulation dot1q
 switchport mode trunk
 switchport trunk allowed vlan 80,90
 no shutdown
- 
-! ── Interfaz hacia R-Core1 (backbone) ─────────────────
+
 interface GigabitEthernet0/1
 description ENLACE-hacia-R-Core1
 no switchport
 ip address 10.70.0.30 255.255.255.252
 no shutdown
- 
-! ── OSPF para anunciar redes de Oriente ───────────────
+
 router ospf 1
 router-id 5.5.5.5
 network 10.70.0.28 0.0.0.3 area 0
 network 172.16.72.0 0.0.0.63 area 0
 network 172.16.72.64 0.0.0.63 area 0
- 
+
 end
 write memory
 ```
@@ -1083,50 +988,44 @@ write memory
 ```sh
 enable
 configure terminal
- 
-! ── Hostname ──────────────────────────────────────────
+
 hostname MS2
- 
-! ── Habilitar enrutamiento IP (Layer 3) ───────────────
+
 ip routing
- 
-! ── VLANs ─────────────────────────────────────────────
+
 vlan 80
 name Boveda
 vlan 90
 name Plataforma
- 
-! ── Interfaces VLAN con HSRP ──────────────────────────
+
 interface Vlan80
 description GATEWAY-VLAN80-Boveda-STANDBY
 ip address 172.16.72.3 255.255.255.192
 standby 1 ip 172.16.72.1
 standby 1 priority 100
 no shutdown
- 
+
 interface Vlan90
 description GATEWAY-VLAN90-Plataforma-STANDBY
 ip address 172.16.72.67 255.255.255.192
 standby 1 ip 172.16.72.65
 standby 1 priority 100
 no shutdown
- 
-! ── Puerto Trunk hacia SW-ACC-OR ──────────────────────
+
 interface FastEthernet0/1
 description TRUNK-hacia-SW-ACC-OR
 switchport trunk encapsulation dot1q
 switchport mode trunk
 switchport trunk allowed vlan 80,90
 no shutdown
- 
-! ── Puerto Trunk hacia MS1 (sincronización) ───────────
+
 interface FastEthernet0/2
 description TRUNK-hacia-MS1
 switchport trunk encapsulation dot1q
 switchport mode trunk
 switchport trunk allowed vlan 80,90
 no shutdown
- 
+
 end
 write memory
 ```
@@ -1141,13 +1040,11 @@ configure terminal
 
 hostname SW-ACC-OR
 
-! ── VLANs ─────────────────────────────────────────────
 vlan 80
 name Boveda
 vlan 90
 name Plataforma
 
-! ── Puertos Trunk hacia MS1 y MS2 (dual uplink) ───────
 interface FastEthernet0/1
 description TRUNK-hacia-MS1-HSRP-Active
 switchport mode trunk
@@ -1160,7 +1057,6 @@ switchport mode trunk
 switchport trunk allowed vlan 80,90
 no shutdown
 
-! ── Puertos de Acceso hacia PCs ───────────────────────
 interface FastEthernet0/3
 description ACCESO-PC-Boveda1-VLAN80
 switchport mode access
@@ -1181,8 +1077,6 @@ write memory
 
 ### PCs — Sede Oriente
 
-> Las PCs usan la **IP virtual HSRP** como gateway. Nunca la IP real de MS1 o MS2.
-
 | PC | IP Address | Subnet Mask | Default Gateway (IP Virtual HSRP) |
 |----|-----------|-------------|-----------------------------------|
 | PC-Boveda1 | 172.16.72.4 | 255.255.255.192 | 172.16.72.1 |
@@ -1195,198 +1089,184 @@ write memory
 ---
 
 ### SW-Dist-DC (Switch 3560-24PS)
- 
+
 ```sh
 enable
 configure terminal
- 
-! ── Hostname ──────────────────────────────────────────
+
 hostname SW-Dist-DC
- 
-! ── Habilitar enrutamiento Layer 3 ───────────────────
+
 ip routing
- 
-! ── VLANs ─────────────────────────────────────────────
+
 vlan 10
 name Core_BD
 vlan 20
 name Web_Apps
 vlan 30
 name NOC
- 
-! ── EtherChannel LACP hacia SW-Acc-BD ─────────────────
+
 interface FastEthernet0/1
 description ETHERCHANNEL-hacia-SW-Acc-BD-cable1
 channel-group 1 mode active
 no shutdown
- 
+
 interface FastEthernet0/2
 description ETHERCHANNEL-hacia-SW-Acc-BD-cable2
 channel-group 1 mode active
 no shutdown
- 
+
 interface Port-channel1
 description ETHERCHANNEL-SW-Dist-DC-SW-Acc-BD
 switchport trunk encapsulation dot1q
 switchport mode trunk
 switchport trunk allowed vlan 10
 no shutdown
- 
-! ── Puerto Trunk hacia SW-Acc-Web ─────────────────────
+
 interface FastEthernet0/3
 description TRUNK-hacia-SW-Acc-Web
 switchport trunk encapsulation dot1q
 switchport mode trunk
 switchport trunk allowed vlan 20,30
 no shutdown
- 
-! ── Interfaz hacia R-Central2 ─────────────────────────
+
 interface GigabitEthernet0/1
-description ENLACE-hacia-R-Central2
-no switchport
 ip address 10.70.0.57 255.255.255.252
 no shutdown
- 
-! ── SVIs para enrutamiento inter-VLAN ─────────────────
+
 interface Vlan10
 description SVI-Core_BD
 ip address 172.16.73.33 255.255.255.240
 no shutdown
- 
+
 interface Vlan20
 description SVI-Web_Apps
 ip address 172.16.73.2 255.255.255.224
 no shutdown
- 
+
 interface Vlan30
 description SVI-NOC
 ip address 172.16.73.49 255.255.255.240
 no shutdown
- 
-! ── CORRECCIÓN: ruta por defecto apunta a R-Central2 ──
+
 ip route 0.0.0.0 0.0.0.0 10.70.0.58
- 
+
 end
 write memory
 ```
- 
+
 ---
- 
-## R-Central2 (Router 2911)
- 
+
+### R-Central2 (Router 2911)
+
 ```sh
 enable
 configure terminal
- 
+
 hostname R-Central2
- 
-! ── Interfaz hacia R-Central1 ─────────────────────────
+
 interface GigabitEthernet0/0
 description ENLACE-hacia-R-Central1
 ip address 10.70.0.26 255.255.255.252
 no shutdown
- 
-! ── Interfaz hacia SW-Dist-DC ─────────────────────────
-interface GigabitEthernet0/2
+
+interface GigabitEthernet0/1
 description ENLACE-hacia-SW-Dist-DC
 ip address 10.70.0.58 255.255.255.252
 no shutdown
- 
-! ── Rutas estáticas hacia las VLANs del Data Center ───
+
 ip route 172.16.73.32 255.255.255.240 10.70.0.57
 ip route 172.16.73.0  255.255.255.224 10.70.0.57
 ip route 172.16.73.48 255.255.255.240 10.70.0.57
- 
-! ── Ruta de retorno hacia el backbone ─────────────────
+
 ip route 0.0.0.0 0.0.0.0 10.70.0.25
- 
+
 end
 write memory
 ```
- 
+
 ---
- 
-## SW-Acc-BD (Switch 2960-24TT) — Sin cambios
- 
+
+### SW-Acc-BD (Switch 2960-24TT)
+
 ```sh
 enable
 configure terminal
- 
+
 hostname SW-Acc-BD
- 
+
 vlan 10
 name Core_BD
- 
-! ── EtherChannel LACP hacia SW-Dist-DC ────────────────
+
 interface FastEthernet0/1
 description ETHERCHANNEL-hacia-SW-Dist-DC-cable1
 channel-group 1 mode active
 no shutdown
- 
+
 interface FastEthernet0/2
 description ETHERCHANNEL-hacia-SW-Dist-DC-cable2
 channel-group 1 mode active
 no shutdown
- 
+
 interface Port-channel1
 description ETHERCHANNEL-SW-Acc-BD-SW-Dist-DC
 switchport mode trunk
 switchport trunk allowed vlan 10
 no shutdown
- 
-! ── Puertos de Acceso hacia Servidores BD ─────────────
+
 interface FastEthernet0/3
 description ACCESO-Server-BD1-VLAN10
 switchport mode access
 switchport access vlan 10
 no shutdown
- 
+
 interface FastEthernet0/4
 description ACCESO-Server-BD2-VLAN10
 switchport mode access
 switchport access vlan 10
 no shutdown
- 
+
 end
 write memory
 ```
- 
+
 ---
- 
-## SW-Acc-Web (Switch 2960-24TT) — Sin cambios
- 
+
+### SW-Acc-Web (Switch 2960-24TT)
+
 ```sh
 enable
 configure terminal
- 
+
 hostname SW-Acc-Web
- 
+
 vlan 20
 name Web_Apps
 vlan 30
 name NOC
- 
+
 interface FastEthernet0/1
 description TRUNK-hacia-SW-Dist-DC
 switchport mode trunk
 switchport trunk allowed vlan 20,30
 no shutdown
- 
+
 interface FastEthernet0/2
 description ACCESO-Server-Web1-VLAN20
 switchport mode access
 switchport access vlan 20
 no shutdown
- 
+
 interface FastEthernet0/3
 description ACCESO-Server-NOC1-VLAN30
 switchport mode access
 switchport access vlan 30
 no shutdown
- 
+
 end
 write memory
 ```
+
+---
 
 ### Servidores — Data Center
 
@@ -1398,6 +1278,23 @@ write memory
 | Server-NOC1 | 172.16.73.50 | 255.255.255.240 | 172.16.73.49 |
 
 ---
+
+## ✅ Resumen de correcciones aplicadas
+
+| # | Dispositivo | Línea corregida | Razón |
+|---|-------------|-----------------|-------|
+| 1 | R-Core2 | `redistribute eigrp 1 subnets metric-type 2` → `redistribute eigrp 1 subnets` | `metric-type 2` no va en esa línea en Cisco IOS |
+| 2 | R-Core2 | Se elimina `#default-metric 20` | `#` no es sintaxis válida; `default-metric` no existe en OSPF |
+| 3 | R-Core3 | Se eliminan líneas con `#` | `#` no es sintaxis válida en Cisco IOS |
+| 4 | R-Central1 | Se eliminan líneas con `#` | `#` no es sintaxis válida en Cisco IOS |
+| 5 | R-Central2 | Puerto `Gig0/1` → `Gig0/2` | Coincide con la conexión física establecida |
+| 6 | R-Central2 | Máscara `255.255.255.224` → `255.255.255.252` | Es un enlace punto a punto /30, no /27 |
+| 7 | MS1 | Se agrega `no switchport` en `GigabitEthernet0/1` | Puerto físico 3560 requiere este comando antes de `ip address` |
+| 8 | SW-Dist-DC | Se agrega `no switchport` en `GigabitEthernet0/1` | Misma razón que MS1 |
+| 9 | VTP Clients | Password `201504070` → `cisco` | El enunciado especifica `Password: cisco` |
+
+---
+
 
 ## ✅ Verificación — Comandos show recomendados
 
