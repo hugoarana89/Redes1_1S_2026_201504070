@@ -424,9 +424,6 @@ Hay tres correcciones que hacer:
 - Falta agregar la fila de Router-on-a-Stick para R-Norte, que también usa subinterfaces (VLANs 50, 60, 70).
 - Falta agregar MS1 y R-Central1 en OSPF.
 
-Aquí están las tablas corregidas:
-
-```markdown
 ### 📋 Resumen de Dispositivos
 
 | Dispositivo | Modelo | Rol | Sede |
@@ -472,7 +469,6 @@ Aquí están las tablas corregidas:
 | Router-on-a-Stick (802.1Q) | R-Norte + SW-Core-N | Sede Norte |
 | VTP (Dominio: bantech70) | SW-Dist-OCC (Server), SW-Cajas/Asesores/Gerencia/Seguridad (Client) | Sede Occidente |
 | VTP (Dominio: bantech70) | SW-Core-N (Server), SW-A-N1/SW-A-N2 (Client) | Sede Norte |
-```
 
 ---
 
