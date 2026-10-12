@@ -68,7 +68,7 @@ Red de campus con **cuatro edificios (A, B, C y D)**, equipos de acceso, un punt
 La carpeta `Parte práctica` contiene el archivo `practica_proyecto.pkt` de la parte práctica del proyecto.
 
 <div align="center">
-  <img src="Proyecto1/img/Topologia.png" alt="Topología del Proyecto 1" width="80%">
+  <img src="Proyecto1/img/Topología_etiqueta.png" alt="Topología del Proyecto 1" width="80%">
 </div>
 
 ### Proyecto 2 · BanTech GT
@@ -83,7 +83,7 @@ Red nacional de una entidad financiera con un **Backbone Core** y cuatro sedes: 
 - Justificación técnica del diseño por sede, pruebas de convergencia, tablas de enrutamiento y pruebas de conmutación por error.
 
 <div align="center">
-  <img src="Proyecto2/img/topologia-completa.png" alt="Topología del Proyecto 2" width="80%">
+  <img src="Proyecto2/img/topologia-etiquetada.png" alt="Topología del Proyecto 2" width="80%">
 </div>
 
 ### Tarea 3 · VTP y VLANs
